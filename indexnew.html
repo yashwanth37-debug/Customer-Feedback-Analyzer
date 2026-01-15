@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback Hub</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-hover: #4338ca;
+      --bg-color: #F3F4F6;
+      --card-bg: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6B7280;
+      --success: #10B981;
+      --danger: #EF4444;
+      --neutral: #9CA3AF;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 40px;
+      font-size: 2.5rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      display: grid;
+      gap: 30px;
+    }
+
+    /* Card Styles */
+    .card {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.25rem;
+      border-bottom: 2px solid #F3F4F6;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      color: var(--text-main);
+    }
+
+    /* Form Styles */
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    select, input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid #E5E7EB;
+      box-sizing: border-box;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      background-color: var(--neutral);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .refresh-btn {
+      background-color: var(--success);
+      margin-bottom: 25px;
+      width: auto;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+    }
+    .refresh-btn:hover { background-color: #059669; }
+
+    /* Dashboard Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    .chart-container {
+      height: 250px;
+      position: relative;
+    }
+
+    /* Insights Box */
+    .insights-box {
+      background-color: #EFF6FF; /* Light blue */
+      border: 1px solid #DBEAFE;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    
+    .insights-list {
+      margin: 0;
+      padding-left: 20px;
+      color: #1E40AF; /* Dark blue text */
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .theme-list {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 20px;
+    }
+    
+    .theme-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #F3F4F6;
+      font-size: 0.95rem;
+    }
+
+    /* Reviews List */
+    .review-scroll {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 10px;
+      padding-right: 10px; /* Space for scrollbar */
+    }
+
+    /* Custom Scrollbar */
+    .review-scroll::-webkit-scrollbar { width: 6px; }
+    .review-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+    .review-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+
+    .review-card {
+      background: #FAFAFA;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .review-text {
+      color: var(--text-main);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin: 0 0 10px 0;
+    }
+
+    .review-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 8px;
+    }
+
+    /* Badges */
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-Positive { background: #D1FAE5; color: #065F46; } /* Green */
+    .badge-Negative { background: #FEE2E2; color: #991B1B; } /* Red */
+    .badge-Neutral { background: #F3F4F6; color: #374151; }  /* Gray */
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .container { padding: 0 10px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>💎 Feedback Hub</h1>
+
+  <div class="card">
+    <h2>✍️ Submit New Feedback</h2>
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+      <div>
+        <label>Product Category</label>
+        <select id="product">
+          <option value="ring">Ring</option>
+          <option value="earring">Earring</option>
+          <option value="necklace">Necklace</option>
+        </select>
+      </div>
+      <div>
+        <label>Rating</label>
+        <input type="number" id="rating" min="1" max="5" value="5">
+      </div>
+    </div>
+
+    <label>Your Review</label>
+    <textarea id="review" placeholder="Tell us about the quality, fit, or design..."></textarea>
+
+    <button id="submitBtn" onclick="submitFeedback()">Submit Feedback</button>
+  </div>
+
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+      <h2>📊 Product Dashboard</h2>
+      <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh Data</button>
+    </div>
+
+    <div class="dashboard-grid">
+      <div>
+        <h3 style="font-size: 1rem; color: var(--text-muted); margin-bottom: 15px;">Sentiment Distribution</h3>
+        <div class="chart-container">
+          <canvas id="sentimentChart"></canvas>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="font-size: 1rem; color: var(--text-muted); margin-bottom: 15px;">Top Themes</h3>
+        <ul id="themes" class="theme-list">
+          <li style="color: #9CA3AF;">No data yet.</li>
+        </ul>
+
+        <div class="insights-box">
+          <strong style="display: block; margin-bottom: 10px; color: #1E40AF;">💡Generated Insights</strong>
+          <div id="insights" class="insights-list">
+            Waiting for data...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 40px; border-bottom: 1px solid #E5E7EB; padding-bottom: 10px;">Recent Reviews</h3>
+    <div id="reviewList" class="review-scroll">
+      <div style="text-align: center; color: var(--text-muted); padding: 20px;">
+        Select a product and click "Refresh" to see reviews.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let chart;
+
+async function submitFeedback() {
+  const btn = document.getElementById("submitBtn");
+  const originalText = btn.innerText;
+  
+  btn.innerText = "Submitting...";
+  btn.disabled = true;
+
+  try {
+    const res = await fetch("http://localhost:8000/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: product.value,
+        rating: rating.value,
+        review: review.value
+      })
+    });
+
+    if (!res.ok) throw new Error("Server error");
+
+    document.getElementById("review").value = "";
+    alert("Feedback submitted successfully!");
+    loadDashboard(); 
+
+  } catch (err) {
+    alert("Failed to submit. Check console for details.");
+    console.error(err);
+  } finally {
+    btn.innerText = originalText;
+    btn.disabled = false;
+  }
+}
+
+async function loadDashboard() {
+  try {
+    const prod = document.getElementById("product").value;
+    
+    const [dashRes, revRes] = await Promise.all([
+      fetch(`http://localhost:8000/dashboard/${prod}`),
+      fetch(`http://localhost:8000/reviews/${prod}`)
+    ]);
+
+    const dashData = await dashRes.json();
+    const revData = await revRes.json();
+
+    const ctx = document.getElementById("sentimentChart").getContext('2d');
+    if (chart) chart.destroy();
+    
+    chart = new Chart(ctx, {
+      type: "doughnut", 
+      data: {
+        labels: Object.keys(dashData.sentimentCount),
+        datasets: [{
+          data: Object.values(dashData.sentimentCount),
+          backgroundColor: ["#10B981", "#EF4444", "#9CA3AF"],
+          borderWidth: 0,
+          hoverOffset: 4
+        }]
+      },
+      options: { 
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' }
+        },
+        cutout: '70%' 
+      }
+    });
+
+    const themesEl = document.getElementById("themes");
+    themesEl.innerHTML = "";
+    let hasThemes = false;
+    for (let t in dashData.themeCount) {
+      if(dashData.themeCount[t] > 0) {
+        hasThemes = true;
+        themesEl.innerHTML += `
+          <li>
+            <span style="text-transform: capitalize;">${t}</span>
+            <span style="font-weight: 600; color: var(--primary);">${dashData.themeCount[t]}</span>
+          </li>`;
+      }
+    }
+    if (!hasThemes) themesEl.innerHTML = "<li style='color: #9CA3AF;'>No specific themes detected yet.</li>";
+
+    const insightsEl = document.getElementById("insights");
+    insightsEl.innerHTML = dashData.insights.length
+      ? dashData.insights.map(i => `• ${i}`).join("<br>")
+      : "No critical actions needed at this time. 👍";
+
+    const listEl = document.getElementById("reviewList");
+    if (revData.length === 0) {
+      listEl.innerHTML = "<div style='text-align:center; padding: 20px; color: #aaa;'>No reviews found for this product.</div>";
+    } else {
+      listEl.innerHTML = revData.reverse().map(r => `
+        <div class="review-card">
+          <div class="review-header">
+            <span style="font-weight: bold; color: var(--text-main);">Rating: ${r.rating} / 5</span>
+            <span class="badge badge-${r.sentiment}">${r.sentiment}</span>
+          </div>
+          <p class="review-text">"${r.review}"</p>
+          <small class="review-meta">
+            <strong>Themes:</strong> ${r.themes ? r.themes.split(",").join(", ") : "None"}
+          </small>
+        </div>
+      `).join("");
+    }
+
+  } catch (err) {
+    console.error("Error loading dashboard:", err);
+  }
+}
+
+window.onload = loadDashboard;
+</script>
+
+</body>
+</html>
