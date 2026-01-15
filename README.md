@@ -5,7 +5,7 @@ It is a full-stack application built for **Giva** to collect, analyze, and visua
 
 ---
 
-## 📋 Logic Explanation (Mandatory for Submission)
+## 📋 Logic Explanation 
 
 As required in **Task A2** and **Task B3**, this system uses **deterministic, rule-based logic** instead of machine learning or external AI services.
 
