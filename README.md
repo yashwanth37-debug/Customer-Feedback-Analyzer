@@ -4,6 +4,17 @@ This repository contains the solution for the **Customer Feedback Analyzer with 
 It is a full-stack application built for **Giva** to collect, analyze, and visualize customer reviews using a **rule-based logic engine (no external AI/ML models)**, strictly following the assignment guidelines.
 
 ---
+## 📸 Application Screenshots
+
+### 📊 Dashboard
+<p align="center">
+  <img src="assets/photo1.jpeg" width="700">
+</p>
+
+<p align="center">
+  <img src="assets/photo2.jpeg" width="700">
+</p>
+
 
 ## 📋 Logic Explanation 
 
